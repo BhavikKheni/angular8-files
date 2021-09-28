@@ -1,0 +1,266 @@
+<app-modal #modal [modalConfig]="modalConfig" (closeModal)="modalClosed($event)">
+  <div class="text-center p-5" *ngIf="isLoading">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  <div class="update-seo-tittle" *ngIf="!isLoading">
+    <div class="card">
+      <div class="card-header">
+        The Seo title
+      </div>
+      <div id="information" class="tab-pane fade in active show" *ngIf="variant">
+        <div class="">
+          <!-- <div class="variant_information">
+            <ul>
+              <li><b>Meta Title:</b> {{ variant.metaTitle || ""}}</li>
+            </ul>
+            <ul>
+              <li><b>Variant Description:</b> {{ variant.seoDescription || ""}}</li>
+            </ul>
+          </div> -->
+          <form class="card-body" [formGroup]="seoTitleComposerForm">
+            <div class="col-12 p-0">
+              <div class="input-flied mb-0">
+                <label>SEO Description</label>
+                <textarea class="form-control height mb-3" formControlName="seoDescription"></textarea>
+                <span
+                  class="count-number float-right mt-2">{{seoTitleComposerForm.controls.seoDescription.value?.length}}</span>
+              </div>
+            </div>
+            <div class="section-div mb-3">
+              <h3>Meta Title Details</h3>
+              <div class="spinner-border text-dark" role="status" *ngIf="isLoader"></div>
+              <div class="content-popup" *ngIf="!isLoader">
+                <div class="variant_information">
+                  <ul>
+                    <li><b>Meta Title:</b> {{ variant.metaTitle || ""}}</li>
+                    <!-- <li><b>Variant Description:</b> {{ variant.seoDescription || ""}}</li> -->
+                  </ul>
+                </div>
+                <div class="input-flied mb-0">
+                  <label>Meta Title Composer {{seoTitleComposerForm.controls.metaTitle.value}}</label>
+                  <!-- <textarea class="form-control height" formControlName="metaTitle"></textarea> -->
+                  <span
+                    class="count-number float-right mt-2 mb-3">{{seoTitleComposerForm.controls.metaTitle.value?.length}}</span>
+                  <span class="text-danger mt-2 mb-3"
+                    *ngIf="seoTitleComposerForm.controls.metaTitle.value?.length > 100">
+                    Maximum character limit 100</span>
+                </div>
+                <div class="example-container">
+                  <div class="input-flied select-main inline-feild mt-1">
+                    <ng-select (change)="onAdd($event)" placeholder="Select option">
+                      <ng-option *ngFor="let cat of options" [value]="cat">{{cat}}</ng-option>
+                    </ng-select>
+                    <!-- <button class="btn bg-info add" (click)="onAdd()">Add</button> -->
+                  </div>
+                  <div id="todo" cdkDropList cdkDropListOrientation="horizontal" class="example-list"
+                    (cdkDropListDropped)="drop($event)">
+                    <div formArrayName="metaTitleArray" class="example-box"
+                      *ngFor="let control of seoTitleComposerForm.controls['metaTitleArray'].controls;let j = index"
+                      cdkDrag>
+                      <div class="input-group" [formGroupName]="j">
+                        <div class="input-flied select-main">
+                          <label>{{control.getRawValue().fieldNameStr}}</label>
+                          <div class="delete">
+                            <i class="fa fa-trash-o" (click)="deleteTitle(j,control.getRawValue().fieldNameStr)"></i>
+                          </div>
+                          <div
+                            *ngIf="['Product Name','Brand','Variant Name'].indexOf(control.getRawValue().fieldNameStr) >=0">
+                            <input class="form-control" type="text" formControlName="disabledField">
+                          </div>
+                          <div *ngIf="control.getRawValue().fieldNameStr === 'Other'">
+                            <input class="form-control" type="text" formControlName="fieldValue"
+                              (change)="generateMetaTitle()">
+                          </div>
+                          <ng-container
+                            *ngIf="['Category','Colour','Material','Moodclip Keyword','Style Keyword'].indexOf(control.getRawValue().fieldNameStr) >=0">
+                            <ng-select [items]="itemDictionary[control.getRawValue().fieldNameStr]" bindLabel="name"
+                              [clearable]="false" bindValue="id" formControlName="fieldValueId"
+                              (change)="generateMetaTitle()">
+                            </ng-select>
+                          </ng-container>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div id="todo" cdkDropList cdkDropListOrientation="horizontal" class="example-list"
+                    (cdkDropListDropped)="drop($event)">
+                    <div formArrayName="metaTitleArray" class="example-box"
+                      *ngFor="let control of seoTitleComposerForm.controls['metaTitleArray'].controls;let j = index"
+                      cdkDrag>
+                      <div class="input-group" [formGroupName]="j">
+                        <div class="input-flied select-main"
+                          *ngIf="['Product Name','Brand Name','Variant Name'].indexOf(control.value.name) >=0">
+                          <label>{{control.value.name}}</label>
+                          <input class="form-control" formControlName="value">
+                        </div>
+                        <div class="input-flied select-main" *ngIf="control.value.name == 'Category Name'">
+                          <label>{{control.value.name}}</label>
+                          <ng-select formControlName="value" (change)="generateMetaTitle()">
+                            <ng-option *ngFor="let cat of categories" [value]="cat.tag.name">{{cat.tag.name}}
+                            </ng-option>
+                          </ng-select>
+                        </div>
+                        <div class="input-flied select-main" *ngIf="control.value.name == 'Colour Name'">
+                          <label>{{control.value.name}}</label>
+                          <ng-select [items]="colours" bindLabel="name" bindValue="name" formControlName="value"
+                            (change)="generateMetaTitle()">
+                          </ng-select>
+                        </div>
+                        <div class="input-flied select-main" *ngIf="control.value.name == 'Material Name'">
+                          <label>{{control.value.name}}</label>
+                          <ng-select [items]="materials" bindLabel="name" bindValue="name" formControlName="value"
+                            (change)="generateMetaTitle()">
+                          </ng-select>
+                        </div>
+                        <div class="input-flied select-main" *ngIf="control.value.name == 'Style Tag Keyword'">
+                          <label>{{control.value.name}}</label>
+                          <ng-select [items]="styleTagKeyword" bindLabel="name" bindValue="name" formControlName="value"
+                            (change)="generateMetaTitle()">
+                          </ng-select>
+                        </div>
+                        <div class="input-flied select-main" *ngIf="control.value.name == 'Moodclip'">
+                          <label>{{control.value.name}}</label>
+                          <ng-select [items]="filterTagKeyword" bindLabel="name" bindValue="name"
+                            formControlName="value" (change)="generateMetaTitle()">
+                          </ng-select>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+            <div class="section-div">
+              <h3>Seo Title Details <button (click)="onAddCategoryComponent()" class="btn bg-info add"
+                  *ngIf="isAddButtonShow">Add Category
+                  Component</button></h3>
+              <div class="col-12 mb-1">
+                <div class="variant_information">
+                  <ul>
+                    <li> <b>Seo Title:</b> {{variant.seoTitle || ""}} </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="input-flied">
+                  <label>Seo Title Composer</label>
+                  <textarea class="form-control height" formControlName="seoTitle"></textarea>
+                  <span
+                    class="count-number float-right mt-2">{{seoTitleComposerForm.controls.seoTitle.value?.length}}</span>
+                  <div *ngIf="submitted && seoTitleComposerForm.controls.seoTitle.errors">
+                    <div *ngIf="submitted && seoTitleComposerForm.controls.seoTitle.errors.required"
+                      class="error mt-2 error">
+                      Seo title is required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row custom-row">
+                <div class="col">
+                  <div class="input-flied select-main">
+                    <label>Product Name</label>
+                    <input class="form-control" formControlName="productName">
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="input-flied select-main">
+                    <label>Style Tag Keyword</label>
+                    <ng-select [items]="styleTagKeyword" bindLabel="name" bindValue="name" formControlName="tagId"
+                      (change)="generateSeoTitle()">
+                    </ng-select>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="input-flied select-main">
+                    <label>Filter Tag Keyword</label>
+                    <ng-select [items]="filterTagKeyword" bindLabel="name" bindValue="name" formControlName="filterId"
+                      (change)="generateSeoTitle()">
+                    </ng-select>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="input-flied select-main">
+                    <label>Product Category</label>
+                    <ng-select formControlName="categoryId" (change)="onChangeCategory($event)">
+                      <ng-option *ngFor="let cat of categories" [value]="cat.tag.name">{{cat.tag.name}}</ng-option>
+                    </ng-select>
+                  </div>
+                </div>
+                <div class="col" *ngIf="selectTagCompond.mainColourId">
+                  <div class="input-flied select-main">
+                    <label>Colour Name</label>
+                    <ng-select [items]="colours" bindLabel="name" bindValue="name" formControlName="colourId"
+                      (change)="generateSeoTitle()">
+                    </ng-select>
+                  </div>
+                </div>
+                <div class="col" *ngIf="selectTagCompond.mainMaterialId">
+                  <div class="input-flied select-main">
+                    <label>Material Name</label>
+                    <ng-select [items]="materials" bindLabel="name" bindValue="name" formControlName="materialId"
+                      (change)="generateSeoTitle()">
+                    </ng-select>
+                  </div>
+                </div>
+              </div>
+              <div formArrayName="componentArray">
+                <div *ngIf="getControlsForOption1">
+                  <div *ngFor="let opt of getControlsForOption1(); let i = index" [formGroupName]="i">
+                    <div class="row custom-row">
+                      <div class="col">
+                        <div class="input-flied select-main customdropdown">
+                          <label> {{i + 1}}. Category Component</label>
+                          <div class="componenterror" *ngIf="opt.get('categoryName')?.errors?.repeated">
+                            {{opt.get('categoryName').value[0]?.componentName + " is already exist"}}</div>
+                          <ng-multiselect-dropdown #multiSelect [settings]="settings"
+                            (onSelect)="onItemSelect($event,opt)" (onDeSelect)="onDeSelect($event,opt)"
+                            formControlName="categoryName" [placeholder]="'select'"
+                            [data]="selectTagCompond?.components" [disabled]="false">
+                          </ng-multiselect-dropdown>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="input-flied select-main">
+                          <label>Colour Name</label>
+                          <ng-select [items]="colours" bindLabel="name" bindValue="name" formControlName="colourName"
+                            (change)="generateSeoTitle()">
+                          </ng-select>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div class="input-flied select-main">
+                          <label>Material Name</label>
+                          <ng-select [items]="materials" bindLabel="name" bindValue="name"
+                            formControlName="materialName" (change)="generateSeoTitle()">
+                          </ng-select>
+                        </div>
+                      </div>
+                      <div class=" addbutton col-auto"><button type="button" class="btn cancel-btn"
+                          (click)="onRemove(i)">Remove</button></div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="header-btn">
+                <!-- <button (click)="onAddCategoryComponent()" class="btn edit-btn" *ngIf="isAddButtonShow">Add Category
+                Component</button> -->
+                <button class="btn edit-btn bg-success border-success text-white" (click)="onRefresh()">Refresh</button>
+                <button type="button" class="btn btn-primary  save-btn"
+                  [disabled]="isSaveLoader|| isDisable  || seoTitleComposerForm.invalid"
+                  (click)="saveSeotitleComposer()">
+                  <span>Save</span>
+                  <span *ngIf="isSaveLoader" class="spinner-border spinner-border-sm " role="status"
+                    aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modal>

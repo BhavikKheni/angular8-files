@@ -1,0 +1,101 @@
+<form class="" [formGroup]="questionaireForm">
+  <div id="parentcollapse">
+    <div formArrayName="cases" *ngIf="profileData && patientCases?.length">
+      <ul class="case-body" *ngFor="let case of questionaireForm.get('cases').controls;let in = index;"
+        [formGroupName]="in">
+
+        <div class="collapse" [attr.id]="'casecard' + in" data-parent="#parentcollapse"
+          [ngClass]="{'show': case?.value?.nextClinicStartTime }">
+          <div class="case-details-main">
+            <div class="accordian-content">
+              <div class="accordion" id="accordionExample">
+                <div>
+                  <div class="card-header">
+                    <h2 class="mb-0">
+                      Questionaire
+                    </h2>
+                  </div>
+                </div>
+                <div class="collapse show" id="collapseExample">
+                  <div class="custom-modal-content">
+                    <div class="nodata" *ngIf="!case?.value?.nextClinicStartTime">
+                      <img src="assets/images/questionaire.svg" width="45px" alt="">
+                      <h3>No Questionaire Available</h3>
+                    </div>
+                    <div>
+                      <div class="accordion" id="accordionExample">
+                        <div class="questionaire-card">
+                          <div>
+                            <div class="">
+                              <div class="p-3">
+                                <div class="row" formArrayName="questionArray">
+                                  <div class="col-4 custom-col"
+                                    *ngFor="let start of case.controls.questionArray.controls; let i = index"
+                                    [formGroupName]="i">
+                                    <div *ngIf="i == 1">
+                                      <label class="provide">Provide the following readings if you have
+                                        the ability to test at home:</label>
+                                    </div>
+                                    <label class="questions-label">
+                                      {{start.controls.question.value}}</label>
+                                    <div *ngIf="start.controls.datatype.value === 'Text'">
+                                      <textarea formControlName="answer" class="form-control"></textarea>
+                                    </div>
+                                    <div class="options" *ngIf="start.controls.type.value === 'NYHA'">
+                                      <label class="mt-2 mb-3 d-block">
+                                        <span class="border-dashed">Please answer the following symptom
+                                          questionnaire - please select one option below which
+                                          applies?</span>
+                                      </label>
+                                      <ng-container *ngFor="let o of nyhaOptionsDictionary[in];let i=index">
+                                        <label class="radio-main">
+                                          <input id="i" type="radio" [value]="o.questionnaire.max"
+                                            formControlName="answer" class="mr-1">
+                                          <span>{{o.question}}</span>
+                                        </label>
+                                      </ng-container>
+                                    </div>
+                                    <div
+                                      *ngIf="start.controls.datatype.value === 'Number' && start.controls.type.value !== 'NYHA'">
+                                      <input type="number" formControlName="answer" class="form-control">
+                                    </div>
+                                    <div *ngIf="start.controls.datatype.value ==='IntegerFraction'" class="d-flex">
+                                      <div class=" pl-0 col-4">
+                                        <span class="titlec">SYSTOLIC</span>
+                                        <input type="number" [(ngModel)]="dictionary2[in].selectedSystolic"
+                                          [ngModelOptions]="{standalone: true}" formControlName="answer"
+                                          class="form-control mr-3">
+                                      </div>
+                                      <div class="col-4">
+                                        <span class="titlec">DIASTOLIC</span>
+                                        <input type="number" class="form-control"
+                                          [(ngModel)]="dictionary2[in].selectedDiastolic"
+                                          [ngModelOptions]="{standalone: true}">
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="btn-footer" *ngIf="case?.value?.nextClinicStartTime">
+                                    <button type="button" class="save-btn" (click)="saveQuestion(case.value.id,in)"
+                                      [disabled]="isSaveQuestionLoader">
+                                      <span>Submit</span>
+                                      <span *ngIf="isSaveQuestionLoader" class="spinner-border spinner-border-sm"
+                                        role="status" aria-hidden="true"></span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ul>
+    </div>
+  </div>
+</form>

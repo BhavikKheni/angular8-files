@@ -1,0 +1,618 @@
+<div>
+  <div class="tblscroll">
+    <table class="table-widthh" *ngIf="!products?.length">
+      <thead>
+        <tr class="top-header-sticky">
+          <!-- <th>IMG</th> -->
+          <th></th>
+          <th>Image</th>
+          <th style="width: 85px; min-width: 85px; max-width: 85px;">Action</th>
+          <th class="name-col">Name</th>
+          <th style="min-width:150px">Brand</th>
+          <th style="min-width:150px">Category</th>
+          <th style="min-width:150px">Room</th>
+          <th class="price-width">Cost Price</th>
+          <th style="min-width: 100px; max-width:110px; width:100px">Status</th>
+          <th>
+            <!-- <span class="top_tooltip">
+              F N <i class="fa fa-question-circle" aria-hidden="true"></i>
+
+              <label> Featured Number</label>
+            </span> -->
+            Featured Number
+          </th>
+          <th>
+            <!-- <span class="top_tooltip">
+              M U <i class="fa fa-question-circle" aria-hidden="true"></i>
+
+              <label>Mark Up</label>
+            </span> -->
+            Mark Up
+          </th>
+          <th>
+            <!-- <span class="top_tooltip">
+              P D <i class="fa fa-question-circle" aria-hidden="true"></i>
+              <label> Promotional Discount</label>
+            </span> -->
+            Promotional Discount
+          </th>
+        </tr>
+        <tr class="bottom-header-sticky">
+          <th>
+            <ng-container *ngIf="products && products.length">
+              <input id="flexCheckDefault" class="check-input" type="checkbox" name="list_name"
+                [(ngModel)]="isMasterSel" (change)="checkUncheckAll($event)" />
+            </ng-container>
+          </th>
+          <th></th>
+          <th></th>
+          <th>
+            <div class="input-filed">
+              <input type="text" placeholder="" [(ngModel)]="searchByText" (keyup)="onSearchByName()" />
+              <img src="assets/images/magnigying_glass.png" alt="">
+            </div>
+          </th>
+          <th>
+            <ng-select [items]="tags.brand" [(ngModel)]="search_criteria.brand" (change)="onChangeFilter()"
+              placeholder="Select" bindLabel="name" bindValue="id">
+            </ng-select>
+          </th>
+          <th>
+            <ng-select bindLabel="name" bindValue="id" placeholder="Select" [items]="tags.category"
+              [(ngModel)]="search_criteria.category" (change)="onChangeFilter()">
+            </ng-select>
+          </th>
+          <th>
+            <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="tags.room"
+              [(ngModel)]="search_criteria.room" (change)="onChangeFilter()">
+            </ng-select>
+          </th>
+          <th></th>
+          <th style="min-width: 100px; max-width:110px; width:100px">
+            <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="statusOptions"
+              [(ngModel)]="search_criteria.status" (change)="onChangeFilter()">
+            </ng-select>
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+
+        </tr>
+
+      </thead>
+      <tbody>
+        <tr *ngIf="!isPaginationAPIRunning && productLoader">
+          <td colspan="100%" class="p-0 border-0">
+            <ng-container class="w-100 text-center">
+              <div class="text-center m-3">
+                <div class="spinner-border text-dark" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <table class="list-item">
+    <cdk-virtual-scroll-viewport style="height: 82vh" itemSize="pageSize" *ngIf="products?.length">
+      <thead>
+        <tr class="top-header-sticky">
+          <!-- <th>IMG</th> -->
+          <th></th>
+          <th>Image</th>
+          <th style="width: 85px; min-width: 85px; max-width: 85px;">Action</th>
+          <th class="name-col">Name</th>
+          <th style="min-width:150px">Brand</th>
+          <th style="min-width:150px">Category</th>
+          <th style="min-width:150px">Room</th>
+          <th class="price-width">Cost Price</th>
+          <th style="min-width: 100px; max-width:110px; width:100px">Status</th>
+          <th>
+            <!-- <span class="top_tooltip">
+              F N <i class="fa fa-question-circle" aria-hidden="true"></i>
+
+              <label> Featured Number</label>
+            </span> -->
+            Featured Number
+
+          </th>
+          <th>
+            <!-- <span class="top_tooltip">
+              M U <i class="fa fa-question-circle" aria-hidden="true"></i>
+
+              <label>Mark Up</label>
+            </span> -->
+            Mark Up
+          </th>
+          <th>
+            <!-- <span class="top_tooltip">
+              P D <i class="fa fa-question-circle" aria-hidden="true"></i>
+              <label> Promotional Discount</label>
+            </span> -->
+            Promotional Discount
+          </th>
+        </tr>
+        <tr class="bottom-header-sticky">
+          <th>
+            <ng-container *ngIf="products && products.length">
+              <div class="input" style="top: -15px; left: 20px;">
+                <input id="flexCheckDefault" class="check-input" type="checkbox" name="list_name"
+                  [(ngModel)]="isMasterSel" (change)="checkUncheckAll($event)" />
+                <span></span>
+              </div>
+            </ng-container>
+          </th>
+          <th></th>
+          <th></th>
+          <th>
+            <div class="input-filed">
+              <input type="text" placeholder="" [(ngModel)]="searchByText" (keyup)="onSearchByName()" />
+              <img src="assets/images/magnigying_glass.png" alt="">
+            </div>
+          </th>
+          <th>
+            <ng-select [items]="tags.brand" [(ngModel)]="search_criteria.brand" (change)="onChangeFilter()"
+              placeholder="Select" bindLabel="name" bindValue="id">
+            </ng-select>
+          </th>
+          <th>
+            <ng-select bindLabel="name" bindValue="id" placeholder="Select" [items]="tags.category"
+              [(ngModel)]="search_criteria.category" (change)="onChangeFilter()">
+            </ng-select>
+          </th>
+          <th>
+            <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="tags.room"
+              [(ngModel)]="search_criteria.room" (change)="onChangeFilter()">
+            </ng-select>
+          </th>
+          <th></th>
+          <th style="min-width: 100px; max-width:110px; width:100px">
+            <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="statusOptions"
+              [(ngModel)]="search_criteria.status" (change)="onChangeFilter()">
+            </ng-select>
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+
+        </tr>
+        <tr *ngIf="!isPaginationAPIRunning && productLoader">
+          <th colspan="100%" class="p-0 border-0">
+            <ng-container class="w-100 text-center">
+              <div class="text-center m-3">
+                <div class="spinner-border text-dark" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+            </ng-container>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="100%" class="p-0 border-0">
+            <ng-container class="w-100 text-center" *ngIf="!isPaginationAPIRunning && productLoader">
+              <div class="text-center m-3">
+                <div class="spinner-border text-dark" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+            </ng-container>
+          </td>
+        </tr>
+        <ng-container *cdkVirtualFor="let product of products; let i = index">
+          <tr (click)="goToProductInfo(product.id)">
+            <td class="text-center">
+              <div class="input">
+                <input class="check-input" type="checkbox" id="flexCheckDefault" name="list_name"
+                  value="{{ product.id }}" [(ngModel)]="product.isChecked" (change)="onCheckboxValueChanged()"
+                  (click)="checkBoxStopPropogation($event)" />
+                <span></span>
+              </div>
+            </td>
+            <td>
+              <div class="product-main-img-list">
+                <div class="zoom-view">
+                  <img [src]="product.mainThumbnail" (click)="openModal($event,product)" />
+                  <div class="icon" (click)="openModal($event,product)">
+                    <i class="fa fa-search-plus" aria-hidden="true"></i>
+                  </div>
+                </div>
+                <!-- <app-image class="rounded product-main-img" [imagePath]="product.mainThumbnail" >
+                </app-image> -->
+                <div class="variant-bedge" (click)="toggle($event, product)">
+                  <span>Variants:</span>
+                  <span class="variant-number">{{
+                    product.variants?.length
+                  }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="icon-button">
+                <!-- <a href="javascript:void(0)" class="delete top_tooltip" (click)="deleteProduct(product._id)" >
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                            <label>Delete</label>
+                          </a> -->
+                <a class="copy top_tooltip" href="javascript:void(0);" (click)="copyCode($event, product)">
+                  <i class="fa fa-clone" aria-hidden="true"></i>
+                  <label>Copy</label>
+                  <!-- <img src="assets/images/copy1.svg" alt=""> -->
+
+
+                </a>
+                <a class="inventory top_tooltip" [routerLink]="['/products', product.id, 'inventory-status']">
+                  <!-- <img src="assets/images/inventory.svg" alt=""> -->
+                  <!-- <i class="fa fa-calculator" aria-hidden="true"></i> -->
+                  <i class="fa fa-list-alt" aria-hidden="true"></i>
+                  <label>inventory</label>
+                </a>
+                <a href="javascript:void(0);" (click)="openTagUpdateModal($event, product)" class="update top_tooltip">
+                  <i class="fa fa-wrench" aria-hidden="true"></i>
+                  <label>Tag Update</label>
+                </a>
+                <a href="javascript:void(0);" (click)="openEditDialog($event, product, i)" class="edit top_tooltip">
+                  <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                  <label>Edit Product</label>
+                </a>
+              </div>
+            </td>
+            <td>{{ product.name }}</td>
+            <td>
+              <div class="brand-list-main" *ngFor="let brand of product?.modified_brands">
+                <app-image [imagePath]="brand.mainThumbnail" class="rounded brand-img"></app-image>
+                <span>{{brand.name}}</span>
+              </div>
+              <!-- <ng-container *ngFor="let brand of product?.modified_brands">
+                <span
+                  class="badge badge-primary"
+                  [popper]="popper1Content"
+                  [popperShowOnStart]="false"
+                  [popperTrigger]="'hover'"
+                  [popperHideOnClickOutside]="false"
+                  [popperApplyClass]="'popper__content'"
+                  [popperHideOnScroll]="true"
+                  [popperPlacement]="'auto'"
+                >
+                  {{ brand.name }}
+                </span>
+                <popper-content #popper1Content>
+                  <div class="">
+                    <div class="popper-description">
+                      <p>ID: {{ brand.id }}</p>
+                    </div>
+                    <div class="popper-image">
+                      <app-image
+                        [imagePath]="brand.mainThumbnail"
+                        class="rounded"
+                      ></app-image>
+                    </div>
+                  </div>
+                </popper-content>
+              </ng-container> -->
+            </td>
+            <td>
+              <div class="cat-list-main" *ngFor="let cat of product?.modified_category">
+                <app-image [imagePath]="cat.mainThumbnail" class="rounded cat-img"></app-image>
+                <span> {{cat.name}}</span>
+              </div>
+              <!-- <ng-container *ngFor="let cat of product.modified_category">
+                <span
+                  class="badge badge-info"
+                  [popper]="popper2Content"
+                  [popperShowOnStart]="false"
+                  [popperTrigger]="'hover'"
+                  [popperHideOnClickOutside]="false"
+                  [popperApplyClass]="'popper__content'"
+                  [popperHideOnScroll]="true"
+                  [popperPlacement]="'auto'"
+                >
+                  {{ cat.name }}
+                </span>
+                <popper-content #popper2Content>
+                  <div class="">
+                    <div class="popper-description">
+                      <p>ID: {{ cat.id }}</p>
+                    </div>
+                    <div class="popper-image">
+                      <app-image
+                        [imagePath]="cat.mainThumbnail"
+                        class="rounded"
+                      ></app-image>
+                    </div>
+                  </div>
+                </popper-content>
+              </ng-container> -->
+            </td>
+            <td>
+              <span class="room-list-main" *ngFor="let room of product?.modified_room">
+                <app-image [imagePath]="room.mainThumbnail" class="rounded room-img"></app-image>
+                <span> {{room.name}}</span>
+              </span>
+              <!-- <ng-container *ngFor="let room of product.modified_room">
+                <span
+                  class="badge badge-danger"
+                  [popper]="popper3Content"
+                  [popperShowOnStart]="false"
+                  [popperTrigger]="'hover'"
+                  [popperHideOnClickOutside]="false"
+                  [popperApplyClass]="'popper__content'"
+                  [popperHideOnScroll]="true"
+                  [popperPlacement]="'auto'"
+                >
+                  {{ room.name }}
+
+                  <popper-content #popper3Content>
+                    <div class="">
+                      <span>ID: {{ room.id }}</span>
+                      <div class="popper-description">
+                      </div>
+                      <div class="popper-image">
+                        <app-image
+                          [imagePath]="room.mainThumbnail"
+                          class="rounded"
+                        ></app-image>
+                      </div>
+                    </div>
+                  </popper-content>
+                </span>
+              </ng-container> -->
+            </td>
+            <td>
+              <div class="price-details">
+                <label>Trade Price </label> <span>
+                  {{ product.tradePrice ? (product.tradePrice | currency:"GBP")  : "NA" }}</span>
+              </div>
+              <div class="price-details">
+                <label>Freight Cost</label> <span>{{product?.freightCost | currency:"GBP"}}</span>
+              </div>
+              <div class="price-details">
+                <label>Delivery Cost</label> <span>{{product?.deliveryCost | currency:"GBP"}}</span>
+              </div>
+
+            </td>
+            <td class="status"> <span [class]="product.status">{{ product.status | titlecase }}</span></td>
+            <td>
+              <!-- <ul>
+                <li *ngIf="product.option1Name">{{ product.option1Name }}</li>
+                <li *ngIf="product.option2Name">{{ product.option2Name }}</li>
+              </ul>
+              <span [hidden]="product.option1Name || product.option2Name"
+                >-</span
+              > -->
+              <span [hidden]="!product.featuredNumber">{{product.featuredNumber}}</span>
+              <span [hidden]="product.featuredNumber">-</span>
+            </td>
+            <td>{{product.markUp}}</td>
+            <td>{{product.promotionalDiscount}}</td>
+
+          </tr>
+          <ng-container *ngIf="
+              product.expanded && product.variants && product.variants.length
+            ">
+            <tr>
+              <td colspan="100%" style="padding: 10px">
+                <table class="subtable">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th style="min-width:170px">SEO Title</th>
+                      <th>Dimensions</th>
+                      <th>Style</th>
+                      <th>Material</th>
+                      <th>Moodclip</th>
+                      <th>Color</th>
+                      <th style="min-width: 100px;">Status</th>
+                      <th style="min-width: 210px; width: 210px; max-width: 210px;">Retail Price</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let variant of product.variants" class="extra_row"
+                      (click)="goToVariantInfo(product.id, variant.id)">
+                      <td>
+                        <app-image [imagePath]="variant.mainThumbnail"></app-image>
+
+                        <div>
+                          {{ variant.name }}
+                        </div>
+                      </td>
+                      <td>{{ variant.seoTitle }}</td>
+                      <td>
+                        <p>H-{{ variant.heightDim }}</p>
+                        <p>L-{{ variant.lengthDim }}</p>
+                        <p>W-{{ variant.widthDim }}</p>
+                      </td>
+                      <td>
+                        <ul>
+                          <li class="brand-list-main" *ngFor="let tag of variant.modified_style">
+                            <app-image [imagePath]="tag.mainThumbnail" class="rounded brand-img"></app-image>
+                            <span> {{tag.name}}</span>
+                          </li>
+                        </ul>
+                        <!-- <ng-container *ngFor="let tag of variant.modified_style">
+                          {{ tag.name }}
+                          <li
+                            [popper]="popper4Content"
+                            [popperShowOnStart]="false"
+                            [popperTrigger]="'hover'"
+                            [popperHideOnClickOutside]="false"
+                            [popperApplyClass]="'popper__content'"
+                            [popperHideOnScroll]="true"
+                            [popperPlacement]="'auto'"
+                          >
+                            {{ tag.name }}
+                          </li>
+                        </ng-container> -->
+                      </td>
+                      <td>
+                        <ul>
+                          <li class="brand-list-main" *ngFor="let tag of variant.modified_material">
+                            <app-image [imagePath]="tag.mainThumbnail" class="rounded brand-img"></app-image>
+                            <span> {{tag.name}}</span>
+                          </li>
+                        </ul>
+                        <!-- <ng-container *ngFor="let tag of variant.modified_material">
+                          {{ tag.name }}
+                          <li
+                            [popper]="popper4Content"
+                            [popperShowOnStart]="false"
+                            [popperTrigger]="'hover'"
+                            [popperHideOnClickOutside]="false"
+                            [popperApplyClass]="'popper__content'"
+                            [popperHideOnScroll]="true"
+                            [popperPlacement]="'auto'"
+                          >
+                            {{ tag.name }}
+                          </li>
+                        </ng-container> -->
+                      </td>
+                      <td>
+                        <ul>
+                          <li class="brand-list-main" *ngFor="let tag of variant.modified_filter">
+                            <app-image [imagePath]="tag.mainThumbnail" class="rounded brand-img"></app-image>
+                            <span> {{tag.name}}</span>
+                          </li>
+                        </ul>
+                      </td>
+                      <td>
+                        <ul>
+                          <li style="white-space: nowrap; width: 100%; display: inline-block; "
+                            *ngFor="let c of variant?.modified_colour">
+                            <span
+                              style="height: 30px; width: 30px; display: inline-block; vertical-align: middle; border-radius: 3px;  "
+                              [style.background-color]="c.colorHexCode"></span>
+                            {{c.name}}
+                          </li>
+                        </ul>
+                        <!-- <ng-container *ngFor="let tag of variant.modified_colour">
+                          {{ tag.name }}
+                          <li
+                            [popper]="popper4Content"
+                            [popperShowOnStart]="false"
+                            [popperTrigger]="'hover'"
+                            [popperHideOnClickOutside]="false"
+                            [popperApplyClass]="'popper__content'"
+                            [popperHideOnScroll]="true"
+                            [popperPlacement]="'auto'"
+                          >
+                            {{ tag.name }}
+                          </li>
+                        </ng-container> -->
+                      </td>
+
+                      <!-- <td>
+                        <ul>
+                          <ng-container *ngFor="let tag of variant.tags">
+                            <li
+                              [popper]="popper4Content"
+                              [popperShowOnStart]="false"
+                              [popperTrigger]="'hover'"
+                              [popperHideOnClickOutside]="false"
+                              [popperApplyClass]="'popper__content'"
+                              [popperHideOnScroll]="true"
+                              [popperPlacement]="'auto'"
+                            >
+                              {{ tag.type }} - {{ tag.name }}
+
+                              <popper-content #popper4Content>
+                                <div class="">
+                                  <p>
+                                    <span>ID: {{ tag.id }}</span>
+                                  </p>
+                                  <div class="popper-description"></div>
+                                  <div class="popper-image">
+                                    <app-image
+                                      [imagePath]="tag.mainThumbnail"
+                                      class="rounded"
+                                    ></app-image>
+                                  </div>
+                                </div>
+                              </popper-content>
+                            </li>
+                          </ng-container>
+                        </ul>
+                      </td> -->
+                      <td class="status">
+                        <span [class]="variant.status">{{ variant.status | titlecase }}</span>
+                        <div class="input-flied select-main" (click)="_onClickSelectionBox($event)">
+                          <!-- <label for="">Status</label> -->
+                          <ng-select [items]="variantStatus" (change)="onChangeStatusValue(product, variant)"
+                            [dropdownPosition]="'bottom'" placeholder="Status" [clearable]="false"
+                            [(ngModel)]="variant.status" bindLabel="name" bindValue="id">
+                          </ng-select>
+                        </div>
+
+
+
+                      </td>
+                      <td>
+                        <div class="price-details">
+                          <label>Surcharge</label> <span>{{variant?.surcharge | currency:'GBP'}}</span>
+                        </div>
+                        <div class="price-details">
+                          <label> RRP</label> <span
+                            [ngClass]="{'color-red': variant.rrpWithoutDiscount ? variant.rrpWithoutDiscount == 0 : 'true'}">
+                            {{ variant?.rrpWithoutDiscount | currency:'GBP'}}</span>
+                        </div>
+                        <div class="price-details">
+                          <label> RRP After Discount</label>
+                          <span [ngClass]="{'color-red': variant.rrp ? variant.rrp == 0 : 'true'}">
+                            {{variant?.rrp | currency:'GBP'}}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="icon-button">
+                          <a class="rrp top_tooltip" href="javascript:void(0);" (click)="copyCode($event, variant)"><i
+                              class="fa fa-clone" aria-hidden="true"></i>
+                            <label>Copy</label>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </tbody>
+      <tfoot *ngIf="isPaginationAPIRunning && !productLoader">
+        <tr>
+          <td colspan="100%">
+            <div class="text-center mt-3 mb-3">
+              <div class="spinner-border text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+      <!-- <ng-container *ngIf="isPaginationAPIRunning && !productLoader">
+        <div class="text-center mt-3 mb-3">
+          <div class="spinner-border text-dark" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      </ng-container> -->
+    </cdk-virtual-scroll-viewport>
+
+  </table>
+
+  <div *ngIf="!productLoader && !products?.length">
+    <p class="text-center p-4">No Record Found</p>
+  </div>
+
+  <!-- <div>
+    <ng-container *ngIf="isPaginationAPIRunning && !productLoader">
+      <div class="text-center m-3">
+        <div class="spinner-border text-dark" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </ng-container>
+  </div> -->
+</div>

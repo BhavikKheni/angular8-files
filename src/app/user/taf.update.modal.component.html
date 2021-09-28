@@ -1,0 +1,259 @@
+<app-modal #modal [modalConfig]="modalConfig" (closeModal)="modalClosed($event)">
+  <div class="tags-grid" *ngIf="product">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2 tag-main-img">
+          <div>
+            <img *ngIf="product && product.mainThumbnail" [src]="product.mainThumbnail" alt="" />
+          </div>
+          <div>
+            <img *ngIf="variant && variant.mainThumbnail" [src]="variant.mainThumbnail" alt="" />
+          </div>
+        </div>
+        <div class="col-sm-4">
+
+          <div class="custom-col">
+            <h4>Search for a tag</h4>
+            <div class="input-flied">
+              <input type="text" class="form-control" placeholder="Search..." (ngModelChange)="searchTag($event)"
+                ngModel />
+              <img src="assets/images/magnigying_glass.png" alt="">
+            </div>
+            <ul class="small-scroll" *ngIf="showLoader">
+              <p>Loading...</p>
+            </ul>
+            <ul class="small-scroll" *ngIf="!showLoader && _tags.length">
+
+              <li *ngFor="let tag of _tags">
+                <div class="icon-name">
+                  <span *ngIf="tag.type != 'colour'" class="tag-img">
+                    <img [src]="tag.mainThumbnail" alt="" />
+                  </span>
+                  <span *ngIf="tag.type == 'colour'" class="tag-img">
+                    <span [style.background-color]="tag.colorHexCode"></span>
+                  </span>
+                  <span>{{tag.name}}
+                    <span class="tag-type">({{tag.type}})</span>
+                  </span>
+                </div>
+                <span class="btn-right">
+                  <button type="button" class="btn btn-sm btn-primary" (click)="assignTag(tag)">
+                    Add
+                  </button>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="custom-col">
+            <h4>Added Tags</h4>
+            <div class="table-main added-tags-table">
+              <table>
+                <thead>
+                  <th>Tag Type</th>
+                  <th>Tag Name</th>
+                  <th style="width: 70px;">Delete</th>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let item of tags | keyvalue">
+                    <tr *ngIf="tags[item.key]?.length">
+                      <td [attr.rowspan]="tags[item.key]?.length + 1">
+                        {{item.key | uppercase}}
+                      </td>
+                    </tr>
+                    <tr *ngFor="let tag of tags[item.key];">
+                      <td>
+                        <div class="tag-name-aligment">
+                          <span *ngIf="tag.type != 'colour'" class="tag-name">
+                            <img [src]="tag.mainThumbnail" alt="" />
+                          </span>
+                          <span *ngIf="tag.type == 'colour'" class="tag-name">
+                            <span [style.background-color]="tag.colorHexCode"></span>
+                          </span>
+                          <span class="name">{{tag.name}}</span>
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <i class="fa fa-trash-o" (click)="deleteProductTag(tag, item.key)"></i>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 text-right">
+          <div class="button-flied">
+            <button class="btn btn-primary" (click)="saveProductTags()" [disabled]="isAPIRunning">
+              <span *ngIf="isAPIRunning">Saving...</span>
+              <span *ngIf="!isAPIRunning">Update</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tags-grid border-0 mb-0" *ngIf="variant">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2 tag-main-img">
+          <div>
+            <img *ngIf="product && product.mainThumbnail" [src]="product.mainThumbnail" alt="" />
+          </div>
+          <div>
+            <img *ngIf="variant && variant.mainThumbnail" [src]="variant.mainThumbnail" alt="" />
+          </div>
+        </div>
+        <div class="col-sm-3 pr-0">
+
+          <div class="custom-col">
+            <h4>Search for a tag</h4>
+            <div class="input-flied">
+              <input type="text" class="form-control" placeholder="Search..." (ngModelChange)="searchTag($event)"
+                ngModel />
+              <img src="assets/images/magnigying_glass.png" alt="">
+
+            </div>
+            <ul class="small-scroll" *ngIf="showLoader">
+              <p>Loading...</p>
+            </ul>
+            <ul class="small-scroll" *ngIf="!showLoader && _tags.length">
+
+              <li *ngFor="let tag of _tags">
+                <div class="icon-name">
+                  <span *ngIf="tag.type != 'colour'" class="tag-img">
+                    <img [src]="tag.mainThumbnail" alt="" />
+                  </span>
+                  <span *ngIf="tag.type == 'colour'" class="tag-img">
+                    <span [style.background-color]="tag.colorHexCode"></span>
+                  </span>
+                  <span>{{tag.name}}
+                    <span class="tag-type">({{tag.type}})</span>
+                  </span>
+                  <!-- <span>{{tag.name}}</span> -->
+                </div>
+                <span class="btn-right">
+                  <button type="button" class="btn btn-sm btn-primary" (click)="assignTag(tag)">Add</button>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-sm-7">
+          <div class="custom-col">
+            <h4>Added Tags</h4>
+            <div class="table-main added-tags-table">
+              <form [formGroup]="tagForm">
+                <table>
+                  <thead>
+                    <th>Tag Type</th>
+                    <th>Keyword </th>
+                    <th>Tag Name</th>
+                    <th></th>
+                    <th>Component</th>
+                    <th style="width: 70px;">Delete</th>
+                  </thead>
+                  <tbody formArrayName="list">
+                    <ng-container *ngFor="let item of tagForm.controls['list'].controls;index as l" [formGroupName]="l">
+                      <tr>
+                        <td [attr.rowspan]="item.controls['tags']?.length + 2">
+                          {{item.value.type | uppercase}}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td [attr.rowspan]="item.controls['tags']?.length + 1">
+                          <div *ngIf="item.get('keywordId')">
+                            <div *ngFor="let k of getKeywords(item.value.type)">
+                              <span>{{k.name}}</span>
+                            </div>
+                          </div>
+                          <!-- <div *ngIf="item.get('keywordId')" class="input-flied select-main">
+                            <ng-select formControlName="keywordId">
+                              <ng-option *ngFor="let k of getKeywords(item.value.type)" [value]="k.id">{{k.name}}
+                              </ng-option>
+                            </ng-select>
+                          </div> -->
+                          <div *ngIf="!item.get('keywordId')">NA</div>
+                        </td>
+                      </tr>
+                      <ng-container formArrayName="tags">
+                        <tr *ngFor="let control of item.controls['tags'].controls; index as i" [formGroupName]="i">
+                          <td>
+                            <div class="tag-name-aligment">
+                              <span *ngIf="control.value.type != 'colour'" class="tag-name">
+                                <img [src]="control.value.mainThumbnail" alt="" />
+                              </span>
+                              <span *ngIf="control.value.type == 'colour'" class="tag-name"
+                                [style.background]="control.value.colorHexCode">
+                              </span>
+                              <span class="tagname">
+                                <span class="no"> {{i + 1}}. </span>
+                                <span class="name"> {{control.value.name}} </span>
+                              </span>
+                            </div>
+                            <input type="hidden" formControlName="priority" [ngValue]="i+1" />
+                          </td>
+                          <td class="text-center">
+                            <div class="updown-btn">
+                              <i class="fa fa-angle-double-up down-btn" aria-hidden="true"
+                                (click)="changeOrder('up', i,item,control)"></i>
+                              <i class="fa fa-angle-double-down down-btn" aria-hidden="true"
+                                (click)="changeOrder('down', i,item,control)"></i>
+                            </div>
+                          </td>
+                          <td>
+                            <div *ngIf="control.get('componentIds');" class="customdropdown">
+                              <div class="error" *ngIf="control.get('componentIds')?.errors?.repeated">{{errorMessage}}
+                              </div>
+                              <ng-multiselect-dropdown #multiSelect [settings]="settings"
+                                (onSelect)="onItemSelect($event,item,control)"
+                                (onSelectAll)="onSelectAll($event,item,control)"
+                                (onDeSelectAll)="onDeSelectAll($event,item,control)"
+                                (onDeSelect)="onDeSelect($event,item,control)" formControlName="componentIds"
+                                [placeholder]="'select'" [data]="categoryComponentList">
+                              </ng-multiselect-dropdown>
+                            </div>
+                            <div *ngIf="control.get('percentage')" class="input-aligment">
+                              <span>Percentage
+                                <span class="required">*</span>
+                              </span>
+                              <input type="number" class="form-control" min="0" pattern="^[1-9]?[0-9]{1}$|^100$"
+                                formControlName="percentage" placeholder="Enter %" />
+                            </div>
+                            <div class="text-danger" *ngIf="submited && control.get('percentage')?.errors?.required">
+                              Percentage is required.
+                            </div>
+                            <div class="text-danger" *ngIf="control.get('percentage')?.errors?.pattern">
+                              Percentage is not valid
+                            </div>
+                            <div *ngIf="!control.get('percentage') && !control.get('componentIds')">NA</div>
+                          </td>
+                          <td class="text-center">
+                            <i class="fa fa-trash-o" (click)="deleteVariantTag(control, item.value.type,i,item)"></i>
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="button-flied">
+            <button class="btn btn-primary" (click)="saveProductTags()" [disabled]="isAPIRunning || tagForm.invalid">
+              <span *ngIf="isAPIRunning">Saving...</span>
+              <span *ngIf="!isAPIRunning">Update</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modal>

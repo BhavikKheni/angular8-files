@@ -1,0 +1,297 @@
+<div>
+  <div class="status-col">
+    <div class="row mt-2">
+      <div class=" custom-col " *ngFor="let count of statusCount">
+        <div class="" (click)="onFilterStatus(count)">
+          <div class="left">
+            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+            <span>{{count.status}}</span>
+          </div>
+          <div class="status">
+            <h2>{{count.count}}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-main mt-2">
+    <h4 class="title">Total Orders:
+      <span>{{totalElements}}</span>
+    </h4>
+    <div class="data-table" id="accordion">
+      <table class="list-item" *ngIf="!orders?.length">
+        <thead>
+          <tr class="top-header-sticky">
+            <th>Order_ID</th>
+            <th>Seller</th>
+            <th>Date</th>
+            <th>No of items</th>
+            <th>Total</th>
+            <th colspan="3">Customer Details</th>
+            <th>Status</th>
+            <th>Payment Status</th>
+            <th></th>
+          </tr>
+          <tr class="bottom-header-sticky">
+            <th>
+              <div class="input-filed">
+                <input type="text" placeholder="" [(ngModel)]="search_criteria.orderId" (keyup)="onChangeFilter()" />
+                <img src="assets/images/magnigying_glass.png" alt="">
+              </div>
+            </th>
+            <th>
+              <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="sellers"
+                [(ngModel)]="search_criteria.sellerId" (change)="onChangeFilter()">
+              </ng-select>
+            </th>
+            <th>
+              <div class="input-filed">
+                <input type="text" class="calender" name="daterangeInput" daterangepicker [options]="options"
+                  (selected)="selectedDate($event, daterange)" />
+              </div>
+            </th>
+            <th></th>
+            <th></th>
+            <th colspan="3">
+              <div class="input-filed">
+                <input type="text" [(ngModel)]="searchByText" (keyup)="onSearchByName()" />
+                <img src="assets/images/magnigying_glass.png" alt="">
+              </div>
+            </th>
+            <th>
+              <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="statusOptions"
+                [(ngModel)]="search_criteria.status" (change)="onChangeFilter()">
+              </ng-select>
+            </th>
+            <th></th>
+            <th></th>
+          </tr>
+
+        </thead>
+        <tbody>
+          <tr *ngIf="!isPaginationAPIRunning && orderLoader">
+            <td colspan="100%" class="p-0 border-0">
+              <ng-container class="w-100 text-center">
+                <div class="text-center m-3">
+                  <div class="spinner-border text-dark" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                </div>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="list-item">
+        <cdk-virtual-scroll-viewport style="height: 70vh" itemSize="pageSize" *ngIf="orders?.length">
+          <thead>
+            <tr class="top-header-sticky">
+              <th>Order_ID</th>
+              <th>Seller</th>
+              <th>Date</th>
+              <th>No of items</th>
+              <th>Total</th>
+              <th colspan="3">Customer Details</th>
+              <th>Status</th>
+              <th>Payment Status</th>
+              <th></th>
+            </tr>
+            <tr class="bottom-header-sticky">
+              <th>
+                <div class="input-filed">
+                  <input type="text" placeholder="" [(ngModel)]="search_criteria.orderId" (keyup)="onChangeFilter()" />
+                  <img src="assets/images/magnigying_glass.png" alt="">
+                </div>
+              </th>
+              <th>
+                <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="sellers"
+                  [(ngModel)]="search_criteria.sellerId" (change)="onChangeFilter()">
+                </ng-select>
+              </th>
+              <th>
+                <div class="input-filed">
+                  <input class="calender" type="text" name="daterangeInput" daterangepicker [options]="options"
+                    (selected)="selectedDate($event, daterange)" />
+                </div>
+              </th>
+              <th></th>
+              <th></th>
+              <th colspan="3">
+                <div class="input-filed">
+                  <input type="text" [(ngModel)]="searchByText" (keyup)="onSearchByName()" />
+                  <img src="assets/images/magnigying_glass.png" alt="">
+                </div>
+              </th>
+              <th>
+                <ng-select bindValue="id" bindLabel="name" placeholder="Select" [items]="statusOptions"
+                  [(ngModel)]="search_criteria.status" (change)="onChangeFilter()">
+                </ng-select>
+              </th>
+              <th></th>
+              <th></th>
+            </tr>
+            <tr *ngIf="!isPaginationAPIRunning && orderLoader">
+              <th colspan="100%" class="p-0 border-0">
+                <ng-container class="w-100 text-center">
+                  <div class="text-center m-3">
+                    <div class="spinner-border text-dark" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                </ng-container>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="100%" class="p-0 border-0">
+                <ng-container class="w-100 text-center" *ngIf="!isPaginationAPIRunning && orderLoader">
+                  <div class="text-center m-3">
+                    <div class="spinner-border text-dark" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                </ng-container>
+              </td>
+            </tr>
+            <ng-container *cdkVirtualFor="let order of orders; let i = index">
+              <tr data-toggle="collapse" [attr.data-target]="'#collapse-' + order.id" [attr.aria-expanded]="false">
+                <td>{{order.id}}</td>
+                <td>
+                  {{order.sellerName}}
+                </td>
+                <td>{{order.createdDate | date:'dd/MM/yyyy'}}</td>
+                <td>
+                  <span class="order-info">{{order.totalItem}}</span>
+                </td>
+                <td>{{isFloat(order.totalAmount) | currency:'GBP'}}</td>
+                <td colspan="3">{{order.customer.customerName}}, {{order.customer.email}},
+                  {{order.address.mobileNumber}}
+                </td>
+                <td class="status">
+                  <span [class]="order.status">{{order.status}}</span>
+                </td>
+                <td>{{order.paymentStatus | uppercase}}</td>
+                <td class="status-btn">
+                  <button class="edit-btn-outline" type="button" (click)="viewOrder($event,order)">View order</button>
+                  <div *ngFor="let button of checkStatus(order.status)">
+                    <button class="edit-btn-outline"
+                      (click)="openStatusChangeDialog($event,button.value,'order',order,'','no-edit')">{{button.name}}</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="11" class="collapse-row" style="padding: 0px; background: #f1f3f6;">
+                  <div [attr.id]="'collapse-' + order.id" class="container-fluid collapse out " data-parent="#accordion"
+                    style="padding:0px; padding-bottom: 15px;">
+                    <div class="product-details-mian">
+                      <div class="product-details-box" *ngFor="let product of order.products">
+                        <div class="innerbox">
+
+                          <div class="order-details">
+
+                            <div class="order-list">
+                              <label> {{product.variant.seoTitle}} </label>
+                              <span> </span>
+                            </div>
+                            <div class="order-list">
+                              <label>Seller - </label>
+                              <span> {{product.sellerName}} </span>
+                            </div>
+                            <div class="order-list">
+                              <label>Status - </label>
+                              <span> {{product.orderStatus}} </span>
+                            </div>
+                            <div class="order-list">
+                              <label>Date - </label>
+                              <span> {{product.createdDate | date: 'dd/MM/yyyy'}} </span>
+                            </div>
+                            <div class="order-list">
+                              <label>Quantity - </label>
+                              <span> {{product.quantity}} </span>
+                            </div>
+                            <div class="order-list">
+                              <label>Unit price - </label>
+                              <span> {{isFloat(product.amount) | currency:"GBP"}} </span>
+                            </div>
+                            <div class="order-list">
+                              <label>Total amount - </label>
+                              <span> {{product.totalAmount | currency:"GBP"}} </span>
+                            </div>
+                            <div class="d-flex mt-2 mr-3 actionbutton">
+                              <div *ngFor="let button of checkStatus(product.orderStatus)">
+                                <button class="edit-btn mr-2"
+                                  (click)="openStatusChangeDialog($event,button.value,'product',product,order.id,'no-edit')">{{button.name}}</button>
+                              </div>
+                              <div *ngIf="!(product.orderStatus === 'Rejected'
+                                          || product.orderStatus === 'Placed'
+                                          || product.orderStatus === 'Cancelled'
+                                          || product.orderStatus === 'Return'
+                                          || product.orderStatus === 'Delivered'
+                                          || product.orderStatus === 'Return Initiated'
+                                          || product.orderStatus === 'Return Approved'
+                                          || product.orderStatus === 'Return Processing'
+                                          )">
+
+                                <button class="edit-btn mr-2"
+                                  (click)="openStatusChangeDialog($event,product.orderStatus,'product',product,order.id,'edit')">Edit
+                                </button>
+
+                              </div>
+                            </div>
+
+                          </div>
+                          <div class="productimg">
+                            <div class="img">
+                              <img [src]="product.variant.mainThumbnail">
+                            </div>
+                            <div class="order-progress">
+                              <div class="order-outer">
+                                <div class="process-box" [ngClass]="{'active': isActive(product,status)}"
+                                  *ngFor="let status of statusProgess">
+                                  <span class="process-status">{{status}}</span>
+                                  <div class="progress-container">
+                                    <div class="progress-point"></div>
+                                    <div class="progress-line"></div>
+                                    <!-- <div class="progress-point fillpoint"></div>
+                                    <div class="progress-line fill"></div> -->
+                                  </div>
+                                  <span class="date" *ngIf="product.comments?.length">
+                                    <!-- <span
+                                      *ngIf="(status == 'delivered' || status == 'dispatched') && !isActive(product,status)">Expected
+                                      by</span> -->
+                                    {{isDate(getDate(product,status)) ? (getDate(product,status) | date:'MMM d, y'):getDate(product,status)}}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+          <tfoot *ngIf="!orderLoader && !orders?.length">
+            <tr>
+              <td colspan="100%">
+                <div class="text-center mt-3 mb-3">
+                  <div class="spinner-border text-dark" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+        </cdk-virtual-scroll-viewport>
+      </table>
+    </div>
+    <div class="text-center mt-3 mb-3" *ngIf="!orderLoader && !orders?.length">
+      <p style="margin: 0;">No Record Found</p>
+    </div>
+  </div>
+</div>

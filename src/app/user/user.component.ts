@@ -32,7 +32,44 @@ export class TableComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() onChangeCheckboxSelection = new EventEmitter();
   @Output() updateTotalNumber = new EventEmitter();
   @ViewChild(CdkVirtualScrollViewport) virtualScroll: CdkVirtualScrollViewport;
-
+  carehomeQuestions = [{
+    answer: "yes",
+    dataType: "Boolean",
+    id: 387420489713793,
+    options: ["no", "yes"],
+    question: "Would you be surprised if resident dies in next 12 months?",
+    sequence: "1",
+    subQuestions: []
+  }, {
+    answer: "yes",
+    dataType: "Boolean",
+    id: 162261469141379,
+    options: ["no", "yes"],
+    question: "EPaCCs completed?",
+    sequence: "3",
+    subQuestions: [{
+      dataType: "Checkbox",
+      id: 549681958855172,
+      parentQuestionId: 162261469141379,
+      question: "Days to live",
+      sequence: "3.1",
+    },
+    {
+      dataType: "Checkbox",
+      id: 549681958855172,
+      parentQuestionId: 162261469141379,
+      question: "Month to live",
+      sequence: "3.2",
+      answer: "yes"
+    },
+    {
+      dataType: "Checkbox",
+      id: 549681958855172,
+      parentQuestionId: 162261469141379,
+      question: "Weeks to live",
+      sequence: "3.3",
+    }]
+  }]
   products: Product[] = [];
   statusOptions: Array<any> = [];
   searchByText: string;
@@ -542,6 +579,38 @@ export class TableComponent implements OnInit, AfterViewInit, OnDestroy {
         sub.remove(sub);
         componentRef.destroy();
       });
+    });
+  }
+  // create main array and subquestion array with update both array
+  renderForm() {
+    this.homeCareForm = this.formBuilder.group({
+      formArray: this.formBuilder.array([]),
+    });
+    carehomeQuestions?.forEach((record) => {
+      const mfg = this.formBuilder.group({
+        id: [record.id],
+        dataType: [record.dataType],
+        answer: [record.answer],
+        question: [record.question],
+        options: [record.options],
+        subQuestions: this.formBuilder.array([])
+      });
+      this.subQuestion(record, mfg);
+      (<FormArray>this.homeCareForm.controls.formArray).push(mfg);
+    });
+  }
+  //create subquestion array and add data in subquestion
+  subQuestion(rec, mfg: FormGroup) {
+    const subQuestions = mfg.get('subQuestions') as FormArray;
+    rec.subQuestions?.forEach((record) => {
+      const fg = this.formBuilder.group({
+        id: [record.id],
+        dataType: [record.dataType],
+        answer: [record.answer],
+        question: [record.question],
+        options: [record.options]
+      })
+      subQuestions.push(fg);
     });
   }
 }
